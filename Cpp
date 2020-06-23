@@ -1,0 +1,110 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+void print(vector<vector<int>> sud)
+{
+    for (int i=0; i<9; i++){
+        if (i == 3 || i == 6)
+        {
+            cout << "---------------------\n";
+        }
+        string line = "";
+        for (int j=0; j<9; j++){
+            if (j == 3 || j == 6)
+            {
+                line += "| ";
+            }
+            line += to_string(sud[i][j]) +" ";
+
+        }
+        cout << line << endl;
+        line = "";
+    }
+    cout << "\n\n";
+}
+
+vector<int> find_zero(vector<vector<int>> sud){
+    for (int i=0; i<9; i++){
+        for (int j=0; j<9; j++){
+            if (sud[i][j] == 0){
+                return {3,4};
+            }
+        }
+    }
+    return {-1, -1};
+}
+
+bool is_valid(vector<vector<int>> sud, int row, int column, int num){
+    //column valid
+    for (int i=0; i<9; i++){
+        if (sud[row][i] == num && i != column){
+            return false;
+        }
+    }
+    //row valid
+    for (int j=0; j<9; j++){
+        if (sud[j][column] == num && j != row){
+            return false;
+        }
+    }
+    //square valid
+    int srow = 3 * (row/3);
+    int scolumn = 3 * (column/3);
+
+    for (int k = srow; k<srow+3; k++){
+        for (int l = scolumn; l<scolumn+3; l++){
+            if (sud[k][l] == num){
+                return false;
+            }
+        }
+    }
+    //if non of the above were met that means it's valid
+    return true;
+}
+
+bool solve(vector<vector<int>> board, int row, int col){
+    vector<int> positions = find_zero(board);
+    if (positions[0] == -1){
+        print(board);
+        return true;
+    }
+    row = positions[0];
+    col = positions[1];
+    for (int i=1; i<10; i++){
+        if (is_valid(board, row, col, i)){
+            board[row][col] = i;
+
+            if (solve(board, 0, 0)){
+                return true;
+            }
+            board[row][col] = 0;
+        }
+    }
+    return false;
+
+}
+
+int main()
+{
+    vector<vector<int>> sudoku = {
+                        {0, 0, 0, 0, 0, 0, 2, 0, 0},
+                        {0, 8, 0, 0, 0, 7, 0, 9, 0},
+                        {6, 0, 2, 0, 0, 0, 5, 0, 0},
+                        {0, 7, 0, 0, 6, 0, 0, 0, 0},
+                        {0, 0, 0, 9, 0, 1, 0, 0, 0},
+                        {0, 0, 0, 0, 2, 0, 0, 4, 0},
+                        {0, 0, 5, 0, 0, 0, 6, 0, 3},
+                        {0, 9, 0, 4, 0, 0, 0, 7, 0},
+                        {0, 0, 6, 0, 0, 0, 0, 0, 0}
+                                                    };
+    print(sudoku);
+    solve(sudoku, 0, 0);
+    print(sudoku)
+
+
+
+    return 0;
+}
